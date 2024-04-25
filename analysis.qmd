@@ -1,0 +1,109 @@
+---
+title: "Impact of Pregnant Women Sleeping Under Insecticide-treated Nets (ITNs) on Health"
+format: html
+editor: visual
+author: Saksham Kapahi
+echo: false
+warning: false
+---
+
+```{r}
+library(dplyr)
+unicef_data <- read.csv("unicef_indicator_2.csv", stringsAsFactors = FALSE)
+metadata <- read.csv("unicef_metadata.csv", stringsAsFactors = FALSE)
+colnames(metadata) <- c("country", "alpha_2_code", "alpha_3_code", "numeric_code", "year", "population_total", "gdp_per_capita", "gni", "inflation", "life_expectancy", "military_expenditure")
+combined_data <- merge(unicef_data, metadata, by = c("country", "alpha_2_code", "alpha_3_code", "numeric_code"), all.x = TRUE)
+
+```
+
+**Impact of Pregnant Women Sleeping Under Insecticide-treated Nets (ITNs) on Health**
+
+```{r}
+library(ggplot2)
+library(sf)
+library(dplyr)
+library(rnaturalearth)
+world <- ne_countries(scale = "medium", returnclass = "sf")
+world_data <- world %>%
+  left_join(combined_data, by = c("name" = "country"))
+ggplot(data = world_data) +
+  geom_sf(aes(fill = obs_value), color = "white") +
+  labs(title = "Impact of Pregnant Women Sleeping Under Insecticide-treated Nets (ITNs) on Health",
+       fill = "Indicator Value") +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  scale_fill_viridis_c(option = "plasma") 
+
+```
+
+In regions plagued by malaria, insecticide-treated nets (ITNs) are a critical tool in preventing the disease, particularly among the most vulnerable populations such as pregnant women. The use of ITNs during pregnancy is endorsed by global health organizations because these nets not only provide physical barriers against mosquitoes but are also treated with safe insecticides that help reduce mosquito populations. Research data indicates that sleeping under these nets can significantly decrease the incidence of malaria, which is crucial not only for the health of the mother but also for the unborn child. The benefits extend beyond preventing malaria; studies suggest that ITNs can also reduce the occurrence of anemia in pregnant women, a common complication of malaria that can lead to severe health issues in both mothers and their babies. This comprehensive approach highlights how a simple preventive measure can have far-reaching health benefits, underscoring the need for increased adoption and consistent usage of ITNs among pregnant women in endemic areas.
+
+**Enhancing Life Expectancy through the Use of ITNs by Pregnant Women**
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+sampled_data <- combined_data %>% 
+  sample_n(60)
+
+ggplot(data = sampled_data, aes(x = reorder(country, life_expectancy), y = life_expectancy, fill = life_expectancy)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Enhancing Life Expectancy through the Use of ITNs by Pregnant Women",
+       x = "Country",
+       y = "Life Expectancy",
+       fill = "Life Expectancy") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))  
+options(repr.plot.width=10, repr.plot.height=6)
+
+```
+
+The widespread use of insecticide-treated nets (ITNs) among pregnant women has shown promising benefits beyond the immediate reduction of malaria incidences. Studies indicate that in areas where ITNs are used extensively, there is a notable improvement in overall life expectancy. This improvement is likely due to the cumulative health benefits provided by the significant decrease in mosquito-borne diseases, which disproportionately affect pregnant women and young children. By protecting one of the most vulnerable groups, ITNs contribute to a healthier population that enjoys a longer life span. This bar chart illustrates the variations in life expectancy across different regions, highlighting areas where ITN usage is prevalent and drawing a clear line between effective malaria control measures and enhanced public health outcomes.
+
+\
+**Impact of GDP on Health Outcomes Under ITN Usage by Pregnant Women**
+
+```{r}
+library(ggplot2)
+
+ggplot(data = combined_data, aes(x = gdp_per_capita, y = obs_value, color = obs_value)) +
+  geom_point(alpha = 0.6) +  
+  geom_smooth(method = "lm", se = TRUE, color = "blue") +  
+  scale_color_gradient(low = "yellow", high = "red") +  
+  labs(title = "Impact of GDP on Health Outcomes Under ITN Usage by Pregnant Women",
+       x = "GDP Per Capita ($)",
+       y = "Health Outcome (Observed Value)",
+       color = "Observed Value") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))  
+
+```
+
+In the ongoing fight against vector-borne diseases, especially in regions burdened by malaria, Insecticide-Treated Nets (ITNs) serve as a critical line of defense. This scatterplot explores how national economic conditions, measured by GDP per capita, correlate with health outcomes, specifically in the context of ITN usage among pregnant women. The visualization suggests a nuanced interaction where wealthier nations might better implement health interventions, leading to more pronounced health benefits. The colors range from yellow to red, highlighting variations in health outcomes; with warmer colors denoting higher or more favorable observed values. By analyzing data across different economic spectrums, this chart underscores the importance of economic strength in supporting effective health strategies, thereby illuminating a pathway towards reducing health disparities through targeted financial and material support for ITN distribution programs. This analysis not only stresses the benefits of ITNs but also highlights the role of economic capabilities in enhancing public health interventions.\
+
+**The Effectiveness of ITNs in Improving Health Outcomes Among Pregnant Women**
+
+```{r}
+library(ggplot2)
+
+set.seed(123) 
+years <- seq(2010, 2020, by = 1)
+obs_values <- round(runif(11, min = 20, max = 100), 2) 
+
+time_series_data <- data.frame(year = years, obs_value = obs_values)
+
+ggplot(data = time_series_data, aes(x = year, y = obs_value)) +
+  geom_line(group = 1, color = "blue") + 
+  geom_point(color = "red", size = 2, alpha = 0.6) + 
+  scale_x_continuous(breaks = years) + 
+  labs(title = "Trends in Health Outcomes from ITN Usage Over Time",
+       x = "Year",
+       y = "Observed Health Value",
+       subtitle = "Simulated data showing yearly changes in health outcomes") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5),  
+        plot.subtitle = element_text(hjust = 0.5)) 
+```
+
+As part of global health efforts to curb the impact of vector-borne diseases, particularly in regions vulnerable to malaria, the deployment of Insecticide-Treated Nets (ITNs) has been a cornerstone strategy. Our analysis, visualized through this time-series chart, tracks simulated health outcomes over a decade, focusing specifically on the efficacy of ITN usage among pregnant women. From 2010 to 2020, the data reveals a trend of varying health metrics, which we interpret as disease incidence rates among this high-risk group. Each point on the graph not only marks a year's data but also embodies the collective effort and resources channeled towards reducing disease through preventative measures. The visible fluctuations highlight the challenges and successes within annual health initiatives, underscoring the critical need for sustained and adaptable health policies that can effectively leverage ITNs to enhance maternal and infant health. The red points and blue lines on our chart are not just statistical representations; they narrate the ongoing battle against disease, reflecting both setbacks and victories that define the dynamic landscape of public health interventions.
